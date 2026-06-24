@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+.env
+missed_calls.json
+review_requests.json
+.DS_Store
