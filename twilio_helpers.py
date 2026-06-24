@@ -26,8 +26,6 @@ def build_voice_twiml(missed_call_url: str) -> str:
         action=missed_call_url,
         timeout=config.RING_DURATION_SECONDS,
     )
-    # Dial the Twilio number itself so it rings — if nobody picks up within
-    # timeout, Twilio hits the action URL with DialCallStatus != "completed".
-    dial.number(config.TWILIO_PHONE_NUMBER)
+    dial.number(config.BUSINESS_OWNER_NUMBER)
     response.append(dial)
     return str(response)
