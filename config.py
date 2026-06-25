@@ -10,6 +10,16 @@ BUSINESS_OWNER_NUMBER = os.environ["BUSINESS_OWNER_NUMBER"]
 BUSINESS_CALLBACK_LINK = os.environ.get("BUSINESS_CALLBACK_LINK", "")
 BUSINESS_REVIEW_LINK = os.environ.get("BUSINESS_REVIEW_LINK", "")
 
+# Booking page branding
+BUSINESS_NAME = os.environ.get("BUSINESS_NAME", "Your Trades Business")
+BUSINESS_TAGLINE = os.environ.get("BUSINESS_TAGLINE", "Fast, reliable, local.")
+
+# Owner dashboard auth (password only; any username accepted)
+DASHBOARD_PASSWORD = os.environ.get("DASHBOARD_PASSWORD", "")
+
+# Review timing: sent the NEXT day at this hour (UTC). UK ≈ UTC, close enough.
+REVIEW_SEND_HOUR = int(os.environ.get("REVIEW_SEND_HOUR", "10"))  # 10:00
+
 # Twilio call behaviour
 RING_DURATION_SECONDS = 20
 
@@ -24,5 +34,11 @@ REVIEW_REQUEST_MESSAGE = (
     "If you have a moment, we'd really appreciate a quick review: {review_link}"
 )
 
-# Delay before sending review SMS (seconds)
-REVIEW_DELAY_SECONDS = 2 * 60 * 60  # 2 hours
+# SMS the owner gets when a customer submits the booking form
+NEW_BOOKING_MESSAGE = (
+    "New booking 🛠\n"
+    "Name: {name}\n"
+    "Phone: {phone}\n"
+    "Address: {address}\n"
+    "Details: {details}"
+)
