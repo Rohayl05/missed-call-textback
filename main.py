@@ -68,7 +68,7 @@ async def job_complete(
 ):
     """Schedule a review SMS to the customer for the next day (legacy API path)."""
     run_at = sched.schedule_review(
-        customer_number=customer_number,
+        customer_number=twilio_helpers.to_e164(customer_number),
         customer_name=customer_name,
     )
     return {"status": "scheduled", "send_at": run_at, "customer": customer_number}
@@ -94,6 +94,7 @@ async def book_submit(
     details: str = Form(default=""),
 ):
     """Log the booking and text the details to the owner."""
+    phone = twilio_helpers.to_e164(phone)
     storage.log_booking(name=name, phone=phone, address=address, details=details)
     twilio_helpers.send_sms(
         to=config.BUSINESS_OWNER_NUMBER,
