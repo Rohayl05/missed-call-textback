@@ -17,8 +17,8 @@ BUSINESS_TAGLINE = os.environ.get("BUSINESS_TAGLINE", "Fast, reliable, local.")
 # Owner dashboard auth (password only; any username accepted)
 DASHBOARD_PASSWORD = os.environ.get("DASHBOARD_PASSWORD", "")
 
-# Review timing: sent the NEXT day at this hour (UTC). UK ≈ UTC, close enough.
-REVIEW_SEND_HOUR = int(os.environ.get("REVIEW_SEND_HOUR", "10"))  # 10:00
+# Review timing: sent the NEXT day at this hour, UK local time (BST-aware).
+REVIEW_SEND_HOUR = int(os.environ.get("REVIEW_SEND_HOUR", "10"))  # 10:00 UK
 
 # Twilio call behaviour
 RING_DURATION_SECONDS = 20
