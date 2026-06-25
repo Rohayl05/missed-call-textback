@@ -83,9 +83,9 @@ Call your Twilio number from another phone and don't answer. After ~20 seconds y
 
 1. Open `http://localhost:8000/book`, fill in the form, and submit. The owner number receives an SMS and the booking lands in `bookings.json`.
 2. Open `http://localhost:8000/dashboard` (any username, password = `DASHBOARD_PASSWORD`). The booking appears under **New bookings**.
-3. Click **✓ Approve & request review**. The booking moves to **Reviews scheduled** with a send time of tomorrow at `REVIEW_SEND_HOUR` (UTC).
+3. Click **✓ Approve & request review**. The booking moves to **Reviews scheduled** with a send time of tomorrow at `REVIEW_SEND_HOUR` UK local time (shown as UTC on the dashboard — in summer that's an hour behind, e.g. 10:00 UK = 09:00 UTC).
 
-To verify the review SMS actually sends, temporarily set `REVIEW_SEND_HOUR` to the current hour and approve a booking close to that time. The legacy `POST /job-complete` API still works and schedules a next-day review too:
+Customer phone numbers entered on the booking form are normalized to E.164 (UK `07…` → `+447…`) so Twilio can deliver. To verify the review SMS actually sends, temporarily set `REVIEW_SEND_HOUR` to the current UK hour and approve a booking close to that time. The legacy `POST /job-complete` API still works and schedules a next-day review too:
 
 ```bash
 curl -X POST http://localhost:8000/job-complete \

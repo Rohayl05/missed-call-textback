@@ -79,9 +79,15 @@ live in config.py so this can be customized per client later.
 - JSON storage is ephemeral on Fly.io: the container filesystem resets on 
   every redeploy, so bookings.json / missed_calls.json / review_requests.json 
   are wiped. Fine for a demo; needs a Fly volume or DB for production.
-- REVIEW_SEND_HOUR is interpreted as UTC. The UK runs UTC+1 during BST 
-  (late Mar–late Oct), so e.g. 10 sends at 11:00 UK time in summer. Make it 
-  timezone-aware if exact local time matters.
+- REVIEW_SEND_HOUR is UK local time (Europe/London, BST-aware): scheduler.py
+  computes the next-day send moment in UK time then converts to UTC for
+  APScheduler. Stored review_scheduled_at / dashboard display is still UTC, so
+  in summer a 10:00 UK send shows as 09:00 UTC — that's correct, not a bug.
+  Requires the tzdata package (in requirements.txt) for zoneinfo on Windows.
+- Customer-entered phone numbers are normalized to E.164 via
+  twilio_helpers.to_e164() at the /book and /job-complete boundaries (UK "0..."
+  -> "+44..."), so Twilio can actually deliver. Numbers from Twilio webhooks
+  (missed calls) are already E.164 and untouched.
 - Dashboard auth fails closed: an empty DASHBOARD_PASSWORD denies all 
   /dashboard and /approve access. It is password-only HTTP Basic (any 
   username) — single-owner grade, not multi-user/role-based.
