@@ -1,10 +1,11 @@
 # missed-call-textback
 
-FastAPI webhook service for UK trades businesses. Features:
-1. **Missed-call auto text-back** — when a call to your Twilio number goes unanswered, the caller gets an SMS within seconds.
-2. **Booking form** — a shareable mobile page (`/book`) where customers submit their details; the owner is texted instantly.
-3. **Owner dashboard** — a password-protected page (`/dashboard`) listing new bookings, missed calls, and scheduled reviews.
-4. **Approval-driven review requests** — the owner approves a finished job on the dashboard, and the customer gets a review-request SMS the **next day** at a sensible hour (no more blind fixed delay).
+FastAPI webhook service for UK trades businesses. When a call to your
+Twilio number goes unanswered, the caller gets an SMS within seconds.
+
+This is one half of a two-service split. The booking form, owner
+dashboard, and review-request flow live in the sibling **review-requests**
+project/repo.
 
 ---
 
@@ -42,11 +43,6 @@ TWILIO_AUTH_TOKEN=your_auth_token
 TWILIO_PHONE_NUMBER=+441234567890
 BUSINESS_OWNER_NUMBER=+447700900000
 BUSINESS_CALLBACK_LINK=https://calendly.com/yourname
-BUSINESS_REVIEW_LINK=https://g.page/r/your-review-link
-BUSINESS_NAME=Dave's Plumbing
-BUSINESS_TAGLINE=Fast, reliable, local plumber in Manchester
-DASHBOARD_PASSWORD=change-me
-REVIEW_SEND_HOUR=10
 ```
 
 ### 4. Run the server
@@ -79,20 +75,7 @@ In the [Twilio Console](https://console.twilio.com), go to your phone number set
 
 Call your Twilio number from another phone and don't answer. After ~20 seconds you should receive an SMS on the calling number.
 
-### 4. Test the booking → approval → review flow
-
-1. Open `http://localhost:8000/book`, fill in the form, and submit. The owner number receives an SMS and the booking lands in `bookings.json`.
-2. Open `http://localhost:8000/dashboard` (any username, password = `DASHBOARD_PASSWORD`). The booking appears under **New bookings**.
-3. Click **✓ Approve & request review**. The booking moves to **Reviews scheduled** with a send time of tomorrow at `REVIEW_SEND_HOUR` UK local time (shown as UTC on the dashboard — in summer that's an hour behind, e.g. 10:00 UK = 09:00 UTC).
-
-Customer phone numbers entered on the booking form are normalized to E.164 (UK `07…` → `+447…`) so Twilio can deliver. To verify the review SMS actually sends, temporarily set `REVIEW_SEND_HOUR` to the current UK hour and approve a booking close to that time. The legacy `POST /job-complete` API still works and schedules a next-day review too:
-
-```bash
-curl -X POST http://localhost:8000/job-complete \
-  -d "customer_number=+447700900000&customer_name=John"
-```
-
-### 5. View logs
+### 4. View logs
 
 ```bash
 curl http://localhost:8000/logs
@@ -126,12 +109,7 @@ fly secrets set \
   TWILIO_AUTH_TOKEN=xxx \
   TWILIO_PHONE_NUMBER=+44xxx \
   BUSINESS_OWNER_NUMBER=+44xxx \
-  BUSINESS_CALLBACK_LINK=https://... \
-  BUSINESS_REVIEW_LINK=https://... \
-  BUSINESS_NAME="Dave's Plumbing" \
-  BUSINESS_TAGLINE="Fast, reliable, local" \
-  DASHBOARD_PASSWORD=a-strong-password \
-  REVIEW_SEND_HOUR=10
+  BUSINESS_CALLBACK_LINK=https://...
 ```
 
 ### 4. Deploy
@@ -155,9 +133,4 @@ https://<your-app>.fly.dev/voice
 |--------|------|-------------|
 | POST | `/voice` | TwiML response — rings 20s, redirects to `/missed-call` if unanswered |
 | POST | `/missed-call` | Sends SMS to caller, logs to `missed_calls.json` |
-| GET | `/book` | Mobile booking form for customers |
-| POST | `/book` | Logs the booking and texts details to the owner |
-| GET | `/dashboard` | Owner dashboard (HTTP Basic auth, password = `DASHBOARD_PASSWORD`) |
-| POST | `/approve` | Approves a booking and schedules its next-day review SMS (auth) |
-| POST | `/job-complete` | Legacy API — schedules a next-day review SMS (`customer_number`, `customer_name` form fields) |
 | GET | `/logs` | Returns all missed call records |

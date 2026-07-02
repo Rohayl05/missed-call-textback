@@ -3,6 +3,4 @@ __pycache__/
 *.pyc
 .env
 missed_calls.json
-review_requests.json
-bookings.json
 .DS_Store
